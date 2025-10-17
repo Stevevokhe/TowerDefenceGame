@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    private Transform target;
+    public Transform target;
     public float speed=5f, health;
     private EnemyPath enemyPath;
-
+    private bool targetFound;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,25 +17,38 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!targetFound) {
+            target = enemyPath.NextWaypoint();
+            targetFound = true;
+        }
         // Where from, where to, how fast
         transform.position = Vector3.MoveTowards(transform.position, target.position, speed*Time.deltaTime);
 
-        if(Vector3.Distance(transform.position, target.position) > 0.5f)
+        if(Vector3.Distance(transform.position, target.position) < 0.5f)
         {
             target = enemyPath.NextWaypoint();
         }
         
     }
 
-    private void OnCollisionEnter(Collision collision)
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        if (health <= 0)
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider collision)
     {
         if (collision.transform.CompareTag("Projectile"))
         {
-            health-=collision.gameObject.GetComponent<Projectile>().GetDamage();
-            if (health >= 0) {
-                Destroy(collision.gameObject);
-                Destroy(this.gameObject);
-            }                        
-        }   
+            Debug.Log("TargetHit");
+            TakeDamage(collision.gameObject.GetComponent<Projectile>().GetDamage());
+            Destroy(collision.gameObject);            
+        }
     }
+
+    
 }

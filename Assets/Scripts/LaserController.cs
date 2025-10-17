@@ -1,25 +1,25 @@
+using System.Collections;
 using UnityEngine;
-[RequireComponent (typeof(SphereCollider))]
-public class CannonController : MonoBehaviour
+
+public class LaserController : MonoBehaviour
 {
-    [SerializeField] private GameObject bullet;
+    [SerializeField] private LineRenderer laserLine;
     [SerializeField] private Transform target;
     [SerializeField] private Transform firingPoint;
     private SphereCollider sphereCollider;
-    [SerializeField] private float range,firingSpeed,projectileDagame,projectileSpeed;
+    [SerializeField] private float range, firingSpeed, damage, laserDuration;
     private float firingSpeedCounter;
     private bool canFire;
-    
+
     [Range(0f, 1f)]
     public float indicatorAalpha = 0.5f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        sphereCollider = GetComponent<SphereCollider> ();
+        sphereCollider = GetComponent<SphereCollider>();
         sphereCollider.radius = range;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (target != null)
@@ -27,21 +27,35 @@ public class CannonController : MonoBehaviour
             transform.LookAt(target.position);
             canFire = true;
         }
-        else {
+        else
+        {
             canFire = false;
         }
-        
-        if(firingSpeed<firingSpeedCounter && canFire)
+
+        if (firingSpeed < firingSpeedCounter && canFire)
         {
             Fire();
             firingSpeedCounter = 0;
         }
+
+
         firingSpeedCounter += Time.deltaTime;
     }
 
     private void Fire()
     {
-        Instantiate(bullet, firingPoint).GetComponent<Projectile>().SetTarget(target, projectileSpeed, projectileDagame);   
+        laserLine.enabled = true;
+        target.GetComponent<EnemyController>().TakeDamage(damage);
+        laserLine.SetPosition(0, firingPoint.position.normalized);
+        laserLine.SetPosition(1, target.transform.position.normalized);
+        canFire = false;
+        StartCoroutine(DisableLaser());
+    }
+
+    private IEnumerator DisableLaser()
+    {
+        yield return new WaitForSeconds(laserDuration);
+        laserLine.enabled = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -51,7 +65,6 @@ public class CannonController : MonoBehaviour
             target = other.transform;
         }
     }
-    
 
     private void OnDrawGizmos()
     {
@@ -65,4 +78,5 @@ public class CannonController : MonoBehaviour
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, range);
     }
+
 }
