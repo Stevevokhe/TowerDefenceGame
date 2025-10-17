@@ -46,8 +46,8 @@ public class LaserController : MonoBehaviour
     {
         laserLine.enabled = true;
         target.GetComponent<EnemyController>().TakeDamage(damage);
-        laserLine.SetPosition(0, firingPoint.position.normalized);
-        laserLine.SetPosition(1, target.transform.position.normalized);
+        laserLine.SetPosition(0, firingPoint.position);
+        laserLine.SetPosition(1, target.transform.position);
         canFire = false;
         StartCoroutine(DisableLaser());
     }
