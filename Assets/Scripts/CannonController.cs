@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 [RequireComponent (typeof(SphereCollider))]
 public class CannonController : MonoBehaviour
@@ -9,12 +10,14 @@ public class CannonController : MonoBehaviour
     [SerializeField] private float range,firingSpeed,projectileDagame,projectileSpeed;
     private float firingSpeedCounter;
     private bool canFire;
-    
-    [Range(0f, 1f)]
+    List<Transform> enemies;
+
+    [UnityEngine.Range(0f, 1f)]
     public float indicatorAalpha = 0.5f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        enemies = new List<Transform>();
         sphereCollider = GetComponent<SphereCollider> ();
         sphereCollider.radius = range;
     }
@@ -22,6 +25,9 @@ public class CannonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (enemies.Count > 0) {
+            target = enemies[0];
+        }
         if (target != null)
         {
             transform.LookAt(target.position);
@@ -40,18 +46,27 @@ public class CannonController : MonoBehaviour
     }
 
     private void Fire()
-    {
-        Instantiate(bullet, firingPoint).GetComponent<Projectile>().SetTarget(target, projectileSpeed, projectileDagame);   
+    {       
+        Projectile shotbullet = Instantiate(bullet, firingPoint).GetComponent<Projectile>();
+        shotbullet.SetTarget(target, projectileSpeed, projectileDagame);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.CompareTag("Enemy"))
         {
-            target = other.transform;
+            enemies.Add(other.transform);
         }
     }
-    
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.transform.CompareTag("Enemy"))
+        {
+            enemies.Remove(other.transform);
+        }
+    }
+
 
     private void OnDrawGizmos()
     {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EnemyPath : MonoBehaviour
 {
-    [SerializeField] List<Transform> waypoints;
+    [SerializeField] public List<Transform> waypoints;
     private Transform nextWaypoint;
     private int currentWaypoint=-1;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -17,12 +17,6 @@ public class EnemyPath : MonoBehaviour
         {
             waypoints.Add(waypoint);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public Transform NextWaypoint()

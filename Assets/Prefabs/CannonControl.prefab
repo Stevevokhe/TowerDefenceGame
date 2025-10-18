@@ -82,9 +82,9 @@ MonoBehaviour:
   target: {fileID: 0}
   firingPoint: {fileID: 262344776087133654}
   range: 15
-  firingSpeed: 5
+  firingSpeed: 2
   projectileDagame: 1
-  projectileSpeed: 50
+  projectileSpeed: 100
   indicatorAalpha: 0.324
 --- !u!135 &7760694233557588237
 SphereCollider:
