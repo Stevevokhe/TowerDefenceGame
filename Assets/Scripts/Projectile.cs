@@ -9,8 +9,10 @@ public class Projectile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (target != null)
-        transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
+        if (target != null) {
+            transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
+        } else { Destroy(this.gameObject); }
+        
     }
 
     public float GetDamage()

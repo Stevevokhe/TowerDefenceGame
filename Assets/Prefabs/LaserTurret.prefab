@@ -41,9 +41,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7948359051836401973}
     m_Modifications:
+    - target: {fileID: 1501070411980597184, guid: e5d9af699d83cc04ca4a77ec1d93067b, type: 3}
+      propertyPath: range
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 6556128123616927435, guid: e5d9af699d83cc04ca4a77ec1d93067b, type: 3}
       propertyPath: m_Name
       value: Laser
+      objectReference: {fileID: 0}
+    - target: {fileID: 7300950721021710238, guid: e5d9af699d83cc04ca4a77ec1d93067b, type: 3}
+      propertyPath: m_Radius
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 8231174551440577361, guid: e5d9af699d83cc04ca4a77ec1d93067b, type: 3}
       propertyPath: m_LocalPosition.x

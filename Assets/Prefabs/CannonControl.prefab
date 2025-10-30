@@ -81,11 +81,12 @@ MonoBehaviour:
   bullet: {fileID: 6384301265146611696, guid: e424e172774347c41a9cad3771388e7c, type: 3}
   target: {fileID: 0}
   firingPoint: {fileID: 262344776087133654}
+  turnSpeed: 2
   range: 15
   firingSpeed: 2
   projectileDagame: 1
   projectileSpeed: 100
-  indicatorAalpha: 0.324
+  enemies: []
 --- !u!135 &7760694233557588237
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -105,7 +106,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 15
+  m_Radius: 25
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9013105881072258085
 GameObject:

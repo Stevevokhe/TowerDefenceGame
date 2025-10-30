@@ -1,43 +1,59 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[RequireComponent (typeof(SphereCollider))]
+[RequireComponent(typeof(SphereCollider))]
 public class CannonController : MonoBehaviour
 {
     [SerializeField] private GameObject bullet;
-    [SerializeField] private Transform target;
-    [SerializeField] private Transform firingPoint;
-    private SphereCollider sphereCollider;
-    [SerializeField] private float range,firingSpeed,projectileDagame,projectileSpeed;
+    [SerializeField] public Transform target;
+    [SerializeField] public Transform firingPoint;
+    [SerializeField] private float turnSpeed = 2f, aimTime = 0.5f;
+    [SerializeField] public float range, firingSpeed, damage, projectileSpeed;
     private float firingSpeedCounter;
-    private bool canFire;
-    List<Transform> enemies;
+    public bool canAim, canFire, isPreparingToShoot;
+    public List<EnemyAgent> enemies;
+    private EventManager eventManager;
 
-    [UnityEngine.Range(0f, 1f)]
-    public float indicatorAalpha = 0.5f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    private void OnEnable()
+    {
+        eventManager = GameObject.FindAnyObjectByType<EventManager>();
+        eventManager.OnEnemyDied += RemoveEnemy;
+    }
+
+    private void OnDisable()
+    {
+        eventManager.OnEnemyDied -= RemoveEnemy;
+    }
+
     void Start()
     {
-        enemies = new List<Transform>();
-        sphereCollider = GetComponent<SphereCollider> ();
-        sphereCollider.radius = range;
+        enemies = new List<EnemyAgent>();
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
-        if (enemies.Count > 0) {
-            target = enemies[0];
-        }
-        if (target != null)
+        if (canAim)
         {
-            transform.LookAt(target.position);
-            canFire = true;
+            Vector3 relativePos = target.position - transform.position;
+            Quaternion toRotation = Quaternion.LookRotation(relativePos);
+            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, turnSpeed * Time.deltaTime);
+            //transform.LookAt(target.position);
+            if (isPreparingToShoot)
+            {
+                StartCoroutine(PrefireDelay());
+                isPreparingToShoot = false;
+            }
+            else
+            {
+                canFire = false;
+            }
         }
-        else {
-            canFire = false;
-        }
-        
-        if(firingSpeed<firingSpeedCounter && canFire)
+
+
+        if (firingSpeed < firingSpeedCounter && canAim)
         {
             Fire();
             firingSpeedCounter = 0;
@@ -45,39 +61,64 @@ public class CannonController : MonoBehaviour
         firingSpeedCounter += Time.deltaTime;
     }
 
-    private void Fire()
-    {       
-        Projectile shotbullet = Instantiate(bullet, firingPoint).GetComponent<Projectile>();
-        shotbullet.SetTarget(target, projectileSpeed, projectileDagame);
+    public virtual void Fire()
+    {
+        Projectile shotbullet = Instantiate(bullet, firingPoint.position, Quaternion.identity).GetComponent<Projectile>();
+        shotbullet.SetTarget(target, projectileSpeed, damage);
     }
 
-    private void OnTriggerEnter(Collider other)
+    IEnumerator PrefireDelay()
+    {
+        Debug.Log("Preparing to fire");
+        yield return new WaitForSeconds(aimTime);
+        canFire = true;
+    }
+
+    public void OnTriggerEnter(Collider other)
     {
         if (other.transform.CompareTag("Enemy"))
         {
-            enemies.Add(other.transform);
+            enemies.Add(other.GetComponent<EnemyAgent>());
+            if (target == null)
+            {
+                target = enemies[0].gameObject.transform;
+            }
+            isPreparingToShoot = true;
+            canAim = true;
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    public void OnTriggerExit(Collider other)
     {
         if (other.transform.CompareTag("Enemy"))
         {
-            enemies.Remove(other.transform);
+            RemoveEnemy(other.GetComponent<EnemyAgent>());
         }
     }
 
-
-    private void OnDrawGizmos()
+    public void RemoveEnemy(EnemyAgent enemy)
     {
-        // Set the color with custom alpha.
-        Gizmos.color = new Color(1f, 0f, 0f, indicatorAalpha); // Red with custom alpha
-
-        // Draw the sphere.
-        Gizmos.DrawSphere(transform.position, range);
-
-        // Draw wire sphere outline.
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(transform.position, range);
+        if (enemies.Contains(enemy))
+        {
+            enemies.Remove(enemy);    
+            
+        }
+        Retarget();
     }
+
+    public void Retarget() {
+        //if enemy count is not 0 but the target is gone, do shit
+        if (enemies.Count == 0 || target == null)
+        {
+            canAim = false;
+        }
+        else
+        {
+            target = enemies[0].gameObject.transform; canAim = true;
+        }
+
+        
+    }
+
+    
 }

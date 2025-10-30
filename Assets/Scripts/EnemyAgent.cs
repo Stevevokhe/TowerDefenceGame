@@ -5,11 +5,13 @@ public class EnemyAgent : MonoBehaviour
 {
     int currentWaypoint, pathLentgh;
     public float speed = 5f, health;
-    NavMeshAgent agent;
+    private NavMeshAgent agent;
     private EnemyPath path;
+    private EventManager eventManager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        eventManager = GameObject.FindAnyObjectByType<EventManager>();
         agent = GetComponent<NavMeshAgent>();
         agent.enabled = true;
         agent.speed = speed;
@@ -34,6 +36,7 @@ public class EnemyAgent : MonoBehaviour
         health -= damage;
         if (health <= 0)
         {
+            eventManager.EnemyDied(this);
             Destroy(this.gameObject);
         }
     }
